@@ -1,0 +1,15 @@
+{
+    "backup_path": "/tmp",
+    "compressor": [
+	"cat"
+    ],
+    "naming_scheme": {
+	"prefix": "test_",
+	"date_format": "%Y-%m-%d",
+	"suffix": ".txt"
+    },
+    "dumper": [
+	"echo",
+	"hi there"
+    ]
+}
