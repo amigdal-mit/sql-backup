@@ -86,10 +86,9 @@ def get_backup_dir(backup_type):
     return "%s/%s" % (config['backup_path'], backup_type)
 
 def get_backup_file_path(backup_type='daily'):
-    subconfig = config['naming_scheme']
+    format_str = '{dir}/' + config['naming_scheme']
     now = date.today()
-    return "%s/%s%s%s" % (get_backup_dir(backup_type), subconfig['prefix'], 
-                          now.strftime(subconfig['date_format']), subconfig['suffix'])
+    return format_str.format(dir=get_backup_dir(backup_type), date=now)
 
 def perform_backup(filename):
     try:

@@ -3,11 +3,7 @@
     "compressor": [
 	"pigz"
     ],
-    "naming_scheme": {
-	"prefix": "sql.mit.edu_",
-	"date_format": "%Y-%m-%d",
-	"suffix": ".sql.gz"
-    },
+    "naming_scheme": "sql.mit.edu_{date:%Y-%m-%d}.sql.gz",
     "dumper": [
 	"mysqldump",
 	"-umit-backup",
