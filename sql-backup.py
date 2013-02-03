@@ -98,6 +98,7 @@ def perform_backup(filename):
             compressor = log_and_popen(config['compressor'], stdin=dumper.stdout, stdout=backup_file)
             dumper.stdout.close()
             compressor.wait()
+            dumper.wait()
     except:
         logger.exception('Failed to perform backup')
         sys.exit(1)
