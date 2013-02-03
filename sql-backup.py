@@ -78,6 +78,7 @@ def load_config(filename):
         config = json.load(open(filename, 'r'))
     except:
         logger.exception('Failed to load configuration file "%s"' % (filename,))
+        sys.exit(1)
 
     logger.info('Loaded "%s"' % (filename,))
 
@@ -91,10 +92,15 @@ def get_backup_file_path(backup_type='daily'):
                           now.strftime(subconfig['date_format']), subconfig['suffix'])
 
 def perform_backup(filename):
-    mysqldump = log_and_popen(config['dumper'], stdout=subprocess.PIPE)
-    compressor = log_and_popen(config['compressor'], stdin=mysqldump.stdout, stdout=open(filename, 'wb'))
-    mysqldump.stdout.close()
-    compressor.wait()
+    try:
+        with open(filename, 'wb') as backup_file:
+            dumper = log_and_popen(config['dumper'], stdout=subprocess.PIPE)
+            compressor = log_and_popen(config['compressor'], stdin=dumper.stdout, stdout=backup_file)
+            dumper.stdout.close()
+            compressor.wait()
+    except:
+        logger.exception('Failed to perform backup')
+        sys.exit(1)
 
 def log_and_popen(*args, **kwargs):
     logger.debug('Popen(%r, %r)' % (args, kwargs))
