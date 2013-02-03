@@ -26,7 +26,7 @@ import json
 import logging
 import sys
 import subprocess
-from datetime import date
+from datetime import datetime
 from optparse import OptionParser
 
 # Configuration has to be stored in a global variable as it has to be
@@ -87,7 +87,7 @@ def get_backup_dir(backup_type):
 
 def get_backup_file_path(backup_type='daily'):
     format_str = '{dir}/' + config['naming_scheme']
-    now = date.today()
+    now = datetime.now()
     return format_str.format(dir=get_backup_dir(backup_type), date=now)
 
 def perform_backup(filename):
