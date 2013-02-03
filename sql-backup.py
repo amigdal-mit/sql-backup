@@ -24,6 +24,8 @@
 
 import json
 import logging
+import os
+import string
 import sys
 import subprocess
 from datetime import datetime
@@ -40,6 +42,15 @@ def main():
     parser.add_option('-v', '--verbose',
                       action='store_true', dest='verbose', default=False,
                       help='print status messages to stdout')
+    parser.add_option('-u', '--user', dest='user',
+                      help='user owning database', metavar='USER')
+    parser.add_option('-d', '--database', dest='database',
+                      help='database to back up', metavar='DB')
+    parser.add_option('--daily', dest='type',
+                      action='store_const', const='daily')
+    parser.add_option('--local', dest='type',
+                      action='store_const', const='')
+    parser.set_defaults(type='daily')
     (options, args) = parser.parse_args()
 
     # Uncomment this to make -v actually work
@@ -54,9 +65,9 @@ def main():
 
     logger.debug(config)
 
-    result_file = get_backup_file_path()
+    result_file = get_backup_file_path(database=options.database, user=options.user, backup_type=options.type)
     logger.info('Backing up to "%s"' % (result_file,))
-    perform_backup(result_file)
+    perform_backup(result_file, database=options.database)
 
 def setup_logger():
     logger = logging.getLogger('sql-backup')
@@ -83,17 +94,21 @@ def load_config(filename):
     logger.info('Loaded "%s"' % (filename,))
 
 def get_backup_dir(backup_type):
-    return "%s/%s" % (config['backup_path'], backup_type)
+    return os.path.join(config['backup_path'], backup_type)
 
-def get_backup_file_path(backup_type='daily'):
+def get_backup_file_path(database=None,user=None,backup_type='daily'):
     format_str = '{dir}/' + config['naming_scheme']
     now = datetime.now()
-    return format_str.format(dir=get_backup_dir(backup_type), date=now)
+    return os.path.normpath(format_str.format(dir=get_backup_dir(backup_type), shard=twolevel(user),
+                                              date=now, user=user, db=database))
 
-def perform_backup(filename):
+def perform_backup(filename,database=None):
     try:
         with open(filename, 'wb') as backup_file:
-            dumper = log_and_popen(config['dumper'], stdout=subprocess.PIPE)
+            dumper_config = config['dumper']
+            if database is not None:
+                dumper_config.append(database)
+            dumper = log_and_popen(dumper_config, stdout=subprocess.PIPE)
             compressor = log_and_popen(config['compressor'], stdin=dumper.stdout, stdout=backup_file)
             dumper.stdout.close()
             compressor.wait()
@@ -109,6 +124,17 @@ def log_and_popen(*args, **kwargs):
 def die(error):
     logger.error(error)
     sys.exit(1)
+
+def twolevel(inp):
+    if inp is None:
+        return ''
+    def convert(letter):
+        return letter if letter in string.ascii_lowercase else 'other'
+    first = convert(inp[0])
+    second = convert(inp[1])
+    if first is 'other':
+        return first
+    return '%s/%s' % (first, second)
 
 logger = setup_logger()
 
