@@ -104,6 +104,11 @@ def get_backup_file_path(database=None,user=None,backup_type='daily'):
 
 def perform_backup(filename,database=None):
     try:
+        # Make the directory if it doesn't exist
+        base_dir = os.path.dirname(filename)
+        if not os.path.exists(base_dir):
+            os.makedirs(base_dir)
+        # Do the backup
         with open(filename, 'wb') as backup_file:
             dumper_config = config['dumper']
             if database is not None:
