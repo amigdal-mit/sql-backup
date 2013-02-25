@@ -8,7 +8,7 @@
 	"mysqldump",
 	"-umit-backup",
 	"--extended-insert",
-	"--force"
+	"--force",
 	"--quick",
 	"--quote-names",
 	"--disable-keys",

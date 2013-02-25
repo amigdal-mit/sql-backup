@@ -13,13 +13,15 @@
 # For this to work, we need to run k5start in "kinit daemon" mode,
 # which means we need a pid fie.
 
-kstartpid=$(mktemp backup-ng-k5start.XXXXXXXXXX)
+kstartpid=$(mktemp /tmp/backup-ng-k5start.XXXXXXXXXX)
 kstartret=1
 
+echo $kstartpid
+
 while [ $kstartret -ne 0 ]; do
-    kstartret=(
+    $((
 	flock --exclusive 200
-	k5start -f /etc/daemon.keytab -u daemon/sql.mit.edu -t -K 15m -l6h -b -c "$kstartpid" || exit 1
+	k5start -f /etc/daemon.keytab -u daemon/sql.mit.edu -t -K 15m -l6h -b -p "$kstartpid" || exit 1
 	# If we get here, we're under both the lock and the k5start
 	
 	# Get a list of all the mysql databases
@@ -31,5 +33,8 @@ while [ $kstartret -ne 0 ]; do
 	# Okay, we're all done. Kill k5start
 	kill -TERM $(cat "$kstartpid")
 	exit 0
-    ) 200> /var/lock/backup-ng.lock
+    ) 200> /var/lock/backup-ng.lock)
+    kstartret=$?
 done
+
+rm -f "$kstartpid"
