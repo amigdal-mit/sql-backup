@@ -16,8 +16,6 @@
 kstartpid=$(mktemp /tmp/backup-ng-k5start.XXXXXXXXXX)
 kstartret=1
 
-echo $kstartpid
-
 while [ $kstartret -ne 0 ]; do
     $((
 	flock --exclusive 200
@@ -26,6 +24,8 @@ while [ $kstartret -ne 0 ]; do
 	
 	# Get a list of all the mysql databases
 	for db in $(mysqlshow.py); do
+	    echo "$db" | grep -q '+'
+	    [ $? -ne 0 ] && continue
 	    user="${db%%+*}"
 	    sql-backup.py --local -c sql.mit.edu-afs.json --user="$user" --database="$db"
 	done
