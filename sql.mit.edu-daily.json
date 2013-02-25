@@ -1,0 +1,18 @@
+{
+    "backup_path": "/srv/backup",
+    "compressor": [
+	"pigz"
+    ],
+    "naming_scheme": "sql.mit.edu_{date:%Y-%m-%d}.sql.gz",
+    "dumper": [
+	"mysqldump",
+	"-umit-backup",
+	"--extended-insert",
+	"--force",
+	"--quick",
+	"--quote-names",
+	"--disable-keys",
+	"--master-data=2",
+	"--all-databases"
+    ]
+}
