@@ -10,5 +10,6 @@
 	"-efqQK",
 	"--master-data=2",
 	"--all-databases"
-    ]
+    ],
+    "keep": 3
 }

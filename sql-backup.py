@@ -69,6 +69,8 @@ def main():
     logger.info('Backing up to "%s"' % (result_file,))
     perform_backup(result_file, database=options.database)
 
+    remove_old_backups(result_file)
+
 def setup_logger():
     logger = logging.getLogger('sql-backup')
     logger.setLevel(logging.DEBUG)
@@ -121,6 +123,24 @@ def perform_backup(filename,database=None):
     except:
         logger.exception('Failed to perform backup')
         sys.exit(1)
+
+def remove_old_backups(backup_file):
+    if 'keep' not in config:
+        # Don't remove old backups
+        return
+    # Configuration has instructed that only n backups are to be kept
+    try:
+        logger.info('Removing old backups...')
+        folder = os.path.dirname(backup_file)
+        backups = [(x, os.lstat(os.path.join(folder, x)).st_mtime) for x in os.listdir(folder)]
+        backups = sorted(backups, key=lambda x: x[1], reverse=True)
+        keep = config['keep']
+        delete = backups[keep:]
+        for (f, _) in delete:
+            os.remove(os.path.join(folder, f))
+    except:
+        logger.exception('Failed to remove old backups')
+
 
 def log_and_popen(*args, **kwargs):
     logger.debug('Popen(%r, %r)' % (args, kwargs))
