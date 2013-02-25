@@ -1,0 +1,22 @@
+{
+    "backup_path": "/afs/athena.mit.edu/contrib/sql/backup/",
+    "compressor": [
+	"pigz"
+    ],
+    "naming_scheme": "{shard}/{user}/{db}.sql.gz",
+    "dumper": [
+	"mysqldump",
+	"-umit-backup",
+	"--extended-insert",
+	"--force"
+	"--quick",
+	"--quote-names",
+	"--disable-keys",
+	"--create-options",
+	"--dump-date",
+	"--no-autocommit",
+	"--routines",
+	"--lock-tables",
+	"--triggers"
+    ]
+}
