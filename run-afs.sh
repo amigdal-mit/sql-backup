@@ -13,6 +13,9 @@
 # For this to work, we need to run k5start in "kinit daemon" mode,
 # which means we need a pid fie.
 
+base=/srv/data/mysql/db
+# Remember that du reports values in kb
+max_size=$((100 * 1024))
 kstartpid=$(mktemp /tmp/backup-ng-k5start.XXXXXXXXXX)
 kstartret=1
 
@@ -24,8 +27,12 @@ while [ $kstartret -ne 0 ]; do
 	
 	# Get a list of all the mysql databases
 	for db in $(mysqlshow.py); do
+	    # Make sure the database is in the form username+db
 	    echo "$db" | grep -q '+'
 	    [ $? -ne 0 ] && continue
+	    # Figure out the size
+	    size=$(du -s /srv/data/mysql/db/$(mysqlname "$db") | awk '{print $1}')
+	    [ $size -gt $max_size ] && echo "Skipping $db" && continue
 	    user="${db%%+*}"
 	    sql-backup.py --local -c sql.mit.edu-afs.json --user="$user" --database="$db"
 	done
