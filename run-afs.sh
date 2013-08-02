@@ -26,12 +26,12 @@ while [ $kstartret -ne 0 ]; do
 	# If we get here, we're under both the lock and the k5start
 	
 	# Get a list of all the mysql databases
-	for db in $(mysqlshow.py); do
+	mysqlshow.py | while read -d $'\0' db; do
 	    # Make sure the database is in the form username+db
 	    echo "$db" | grep -q '+'
 	    [ $? -ne 0 ] && continue
 	    # Figure out the size
-	    size=$(du -s /srv/data/mysql/db/$(mysqlname "$db") | awk '{print $1}')
+	    size=$(du -s ${base}/$(mysqlname "$db") | awk '{print $1}')
 	    [ $size -gt $max_size ] && echo "Skipping $db" && continue
 	    user="${db%%+*}"
 	    sql-backup.py --local -c sql.mit.edu-afs.json --user="$user" --database="$db"

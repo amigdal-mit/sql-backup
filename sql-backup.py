@@ -54,8 +54,8 @@ def main():
     (options, args) = parser.parse_args()
 
     # Uncomment this to make -v actually work
-    #logger.setLevel(logging.INFO if options.verbose else 
-    #                logging.WARNING)
+    logger.setLevel(logging.INFO if options.verbose else
+                    logging.WARNING)
 
     logger.debug(options)
 
