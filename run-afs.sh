@@ -31,7 +31,7 @@ while [ $kstartret -ne 0 ]; do
 	    [[ "$db" == *+* ]] || continue
 	    # Figure out the size
 	    size=$(du -s ${base}/"$filename" | awk '{print $1}')
-	    [ $size -gt $max_size ] && echo "Skipping $db" && continue
+	    [ "$size" -gt "$max_size" ] && echo "Skipping $db" && continue
 	    user="${db%%+*}"
 	    sql-backup.py --local -c sql.mit.edu-afs.json --user="$user" --database="$db"
 	done
