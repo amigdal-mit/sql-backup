@@ -22,7 +22,7 @@ kstartret=1
 while [ $kstartret -ne 0 ]; do
     (
 	flock --exclusive 200
-	k5start -f /etc/daemon.keytab -u daemon/sql.mit.edu -t -K 15m -l6h -b -p "$kstartpid" || exit 1
+	k5start -f /etc/daemon.keytab -u daemon/sql.mit.edu -t -K 15 -l 6h -b -p "$kstartpid" || exit 1
 	# If we get here, we're under both the lock and the k5start
 	
 	# Get a list of all the mysql databases
