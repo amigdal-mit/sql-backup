@@ -29,29 +29,29 @@ import string
 import sys
 import subprocess
 from datetime import datetime
-from optparse import OptionParser
+from argparse import ArgumentParser
 
 # Configuration has to be stored in a global variable as it has to be
 # accessible to all functions
 config = None
 
 def main():
-    parser = OptionParser()
-    parser.add_option('-c', '--config', dest='config',
-                      help='path to configuration', metavar='FILE')
-    parser.add_option('-v', '--verbose',
-                      action='store_true', dest='verbose', default=False,
-                      help='print status messages to stdout')
-    parser.add_option('-u', '--user', dest='user',
-                      help='user owning database', metavar='USER')
-    parser.add_option('-d', '--database', dest='database',
-                      help='database to back up', metavar='DB')
-    parser.add_option('--daily', dest='type',
-                      action='store_const', const='daily')
-    parser.add_option('--local', dest='type',
-                      action='store_const', const='')
+    parser = ArgumentParser(description='Back up SQL.')
+    parser.add_argument('-c', '--config', dest='config',
+                        help='path to configuration', metavar='FILE')
+    parser.add_argument('-v', '--verbose',
+                        action='store_true', dest='verbose', default=False,
+                        help='print status messages to stdout')
+    parser.add_argument('-u', '--user', dest='user',
+                        help='user owning database', metavar='USER')
+    parser.add_argument('-d', '--database', dest='database',
+                        help='database to back up', metavar='DB')
+    parser.add_argument('--daily', dest='type',
+                        action='store_const', const='daily')
+    parser.add_argument('--local', dest='type',
+                        action='store_const', const='')
     parser.set_defaults(type='daily')
-    (options, args) = parser.parse_args()
+    options = parser.parse_args()
 
     # Uncomment this to make -v actually work
     logger.setLevel(logging.INFO if options.verbose else
@@ -157,7 +157,7 @@ def twolevel(inp):
         return letter if letter in string.ascii_lowercase else 'other'
     first = convert(inp[0])
     second = convert(inp[1])
-    if first is 'other':
+    if first == 'other':
         return first
     return '%s/%s' % (first, second)
 
